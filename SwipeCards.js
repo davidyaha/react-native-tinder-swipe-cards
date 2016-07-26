@@ -9,7 +9,7 @@ import {
     View,
     Animated,
     PanResponder,
-    Image
+    TouchableOpacity,
 } from 'react-native';
 
 import clamp from 'clamp';
@@ -51,7 +51,11 @@ var styles = StyleSheet.create({
     nopeText: {
         fontSize: 16,
         color: 'red',
-    }
+    },
+    buttonContainerStyle: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
 });
 
 class SwipeCards extends Component {
@@ -60,6 +64,10 @@ class SwipeCards extends Component {
     renderCards: React.PropTypes.func,
     loop: React.PropTypes.bool,
     renderNoMoreCards: React.PropTypes.func,
+    renderYupButton: React.PropTypes.func,
+    renderYup: React.PropTypes.func,
+    renderNopeButton: React.PropTypes.func,
+    renderNope: React.PropTypes.func,
     showYup: React.PropTypes.bool,
     showNope: React.PropTypes.bool,
     handleYup: React.PropTypes.func,
@@ -67,6 +75,7 @@ class SwipeCards extends Component {
     yupText: React.PropTypes.string,
     noText: React.PropTypes.string,
     containerStyle: View.propTypes.style,
+    buttonContainerStyle: View.propTypes.style,
     yupStyle: View.propTypes.style,
     yupTextStyle: Text.propTypes.style,
     nopeStyle: View.propTypes.style,
@@ -120,7 +129,7 @@ class SwipeCards extends Component {
     ).start();
   }
 
-  componentWillReceiveProps(nextProps){
+  componentWillReceiveProps(nextProps) {
     if(nextProps.cards && nextProps.cards.length > 0){
       this.setState({
         card: nextProps.cards[0]
@@ -182,7 +191,27 @@ class SwipeCards extends Component {
     this._goToNextCard();
     this._animateEntrance();
   }
-
+  
+  _onYupPress() {
+    this.props.handleYup(this.state.card);
+    this.props.cardRemoved
+      ? this.props.cardRemoved(this.props.cards.indexOf(this.state.card))
+      : null;
+    Animated.timing(this.state.pan, {
+      toValue: {x: 1000, y: 0},
+    }).start(this._resetState.bind(this));
+  }
+  
+  _onNopePress() {
+    this.props.handleNope(this.state.card);
+    this.props.cardRemoved
+      ? this.props.cardRemoved(this.props.cards.indexOf(this.state.card))
+      : null;
+    Animated.timing(this.state.pan, {
+      toValue: {x: -1000, y: 0},
+    }).start(this._resetState.bind(this));
+  }
+  
   renderNoMoreCards() {
     if (this.props.renderNoMoreCards)
       return this.props.renderNoMoreCards();
@@ -194,6 +223,16 @@ class SwipeCards extends Component {
 
   renderCard(cardData) {
     return this.props.renderCard(cardData)
+  }
+  
+  _renderButton(renderFunc, onPress) {
+    if (renderFunc) {
+      return (
+        <TouchableOpacity onPress={onPress}>
+          {renderFunc()}
+        </TouchableOpacity>
+      )
+    }
   }
 
   render() {
@@ -214,44 +253,47 @@ class SwipeCards extends Component {
     let nopeOpacity = pan.x.interpolate({inputRange: [-150, 0], outputRange: [1, 0]});
     let nopeScale = pan.x.interpolate({inputRange: [-150, 0], outputRange: [1, 0.5], extrapolate: 'clamp'});
     let animatedNopeStyles = {transform: [{scale: nopeScale}], opacity: nopeOpacity}
-
-        return (
-            <View style={this.props.containerStyle}>
-                { this.state.card
-                    ? (
-                    <Animated.View style={[styles.card, animatedCardstyles]} {...this._panResponder.panHandlers}>
-                        {this.renderCard(this.state.card)}
-                    </Animated.View>
-                )
-                    : this.renderNoMoreCards() }
-
-
+  
+    return (
+      <View style={this.props.containerStyle}>
+        { this.state.card
+          ? (
+          <Animated.View style={[styles.card, animatedCardstyles]} {...this._panResponder.panHandlers}>
+            {this.renderCard(this.state.card)}
+          </Animated.View>
+        )
+          : this.renderNoMoreCards() }
+  
+  
         { this.props.renderNope
           ? this.props.renderNope(pan)
-          : (
-              this.props.showNope
-              ? (
-                <Animated.View style={[this.props.nopeStyle, animatedNopeStyles]}>
-                  <Text style={this.props.nopeTextStyle}>{this.props.noText ? this.props.noText : "Nope!"}</Text>
-                </Animated.View>
-                )
-              : null
+          : ( this.props.showNope
+            ? (
+              <Animated.View style={[this.props.nopeStyle, animatedNopeStyles]}>
+                <Text style={this.props.nopeTextStyle}>{this.props.noText ? this.props.noText : "Nope!"}</Text>
+              </Animated.View>
             )
+            : null
+          )
         }
-
+      
         { this.props.renderYup
           ? this.props.renderYup(pan)
-          : (
-              this.props.showYup
-              ? (
-                <Animated.View style={[this.props.yupStyle, animatedYupStyles]}>
-                  <Text style={this.props.yupTextStyle}>{this.props.yupText? this.props.yupText : "Yup!"}</Text>
-                </Animated.View>
-              )
-              : null
+          : ( this.props.showYup
+            ? (
+              <Animated.View style={[this.props.yupStyle, animatedYupStyles]}>
+                <Text style={this.props.yupTextStyle}>{this.props.yupText ? this.props.yupText : "Yup!"}</Text>
+              </Animated.View>
             )
+            : null
+          )
         }
-
+      
+        <View style={[styles.buttonContainerStyle, this.props.buttonContainerStyle]}>
+          {this._renderButton(this.props.renderNopeButton, this._onNopePress.bind(this))}
+          {this._renderButton(this.props.renderYupButton, this._onYupPress.bind(this))}
+        </View>
+    
       </View>
     );
   }
