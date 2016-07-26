@@ -55,6 +55,35 @@ var styles = StyleSheet.create({
 });
 
 class SwipeCards extends Component {
+  static propTypes = {
+    cards: React.PropTypes.array,
+    renderCards: React.PropTypes.func,
+    loop: React.PropTypes.bool,
+    renderNoMoreCards: React.PropTypes.func,
+    showYup: React.PropTypes.bool,
+    showNope: React.PropTypes.bool,
+    handleYup: React.PropTypes.func,
+    handleNope: React.PropTypes.func,
+    yupText: React.PropTypes.string,
+    noText: React.PropTypes.string,
+    containerStyle: View.propTypes.style,
+    yupStyle: View.propTypes.style,
+    yupTextStyle: Text.propTypes.style,
+    nopeStyle: View.propTypes.style,
+    nopeTextStyle: Text.propTypes.style
+  }
+  
+  static defaultProps = {
+    loop: false,
+    showYup: true,
+    showNope: true,
+    containerStyle: styles.container,
+    yupStyle: styles.yup,
+    yupTextStyle: styles.yupText,
+    nopeStyle: styles.nope,
+    nopeTextStyle: styles.nopeText
+  }
+  
   constructor(props) {
     super(props);
 
@@ -227,34 +256,5 @@ class SwipeCards extends Component {
     );
   }
 }
-
-SwipeCards.propTypes = {
-    cards: React.PropTypes.array,
-    renderCards: React.PropTypes.func,
-    loop: React.PropTypes.bool,
-    renderNoMoreCards: React.PropTypes.func,
-    showYup: React.PropTypes.bool,
-    showNope: React.PropTypes.bool,
-    handleYup: React.PropTypes.func,
-    handleNope: React.PropTypes.func,
-    yupText: React.PropTypes.string,
-    noText: React.PropTypes.string,
-    containerStyle: View.propTypes.style,
-    yupStyle: View.propTypes.style,
-    yupTextStyle: Text.propTypes.style,
-    nopeStyle: View.propTypes.style,
-    nopeTextStyle: Text.propTypes.style
-};
-
-SwipeCards.defaultProps = {
-    loop: false,
-    showYup: true,
-    showNope: true,
-    containerStyle: styles.container,
-    yupStyle: styles.yup,
-    yupTextStyle: styles.yupText,
-    nopeStyle: styles.nope,
-    nopeTextStyle: styles.nopeText
-};
 
 export default SwipeCards
