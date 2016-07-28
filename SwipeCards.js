@@ -228,7 +228,7 @@ class SwipeCards extends Component {
   _renderButton(renderFunc, onPress) {
     if (renderFunc) {
       return (
-        <TouchableOpacity onPress={onPress}>
+        <TouchableOpacity disabled={!this.state.card} onPress={onPress}>
           {renderFunc()}
         </TouchableOpacity>
       )
@@ -289,10 +289,15 @@ class SwipeCards extends Component {
           )
         }
       
-        <View style={[styles.buttonContainerStyle, this.props.buttonContainerStyle]}>
-          {this._renderButton(this.props.renderNopeButton, this._onNopePress.bind(this))}
-          {this._renderButton(this.props.renderYupButton, this._onYupPress.bind(this))}
-        </View>
+        { this.state.card  ?
+          
+          <View style={[styles.buttonContainerStyle, this.props.buttonContainerStyle]}>
+            {this._renderButton(this.props.renderNopeButton, this._onNopePress.bind(this))}
+            {this._renderButton(this.props.renderYupButton, this._onYupPress.bind(this))}
+          </View>
+          
+          : null
+        }
     
       </View>
     );
