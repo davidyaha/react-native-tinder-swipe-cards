@@ -10,13 +10,15 @@ import {
     Animated,
     PanResponder,
     TouchableOpacity,
+    Dimensions,
 } from 'react-native';
 
 import clamp from 'clamp';
 
 import Defaults from './Defaults.js';
 
-var SWIPE_THRESHOLD = 120;
+const SWIPE_THRESHOLD = 120;
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 // Base Styles. Use props to override these values
 var styles = StyleSheet.create({
@@ -162,19 +164,23 @@ class SwipeCards extends Component {
         }
 
         if (Math.abs(this.state.pan.x._value) > SWIPE_THRESHOLD) {
-
-          this.state.pan.x._value > 0
-            ? this.props.handleYup(this.state.card)
-            : this.props.handleNope(this.state.card)
-
-          this.props.cardRemoved
-            ? this.props.cardRemoved(this.props.cards.indexOf(this.state.card))
-            : null
+          
+          this.props.cardRemoved &&
+          this.props.cardRemoved(this.props.cards.indexOf(this.state.card));
 
           Animated.decay(this.state.pan, {
             velocity: {x: velocity, y: vy},
             deceleration: 0.98
-          }).start(this._resetState.bind(this))
+          }).start(()=> {
+            
+            // After animation
+            this.state.pan.x._value > 0 ?
+              this.props.handleYup(this.state.card) :
+              this.props.handleNope(this.state.card);
+            
+            this._resetState()
+          })
+          
         } else {
           Animated.spring(this.state.pan, {
             toValue: {x: 0, y: 0},
@@ -193,23 +199,27 @@ class SwipeCards extends Component {
   }
   
   _onYupPress() {
-    this.props.handleYup(this.state.card);
     this.props.cardRemoved
       ? this.props.cardRemoved(this.props.cards.indexOf(this.state.card))
       : null;
     Animated.timing(this.state.pan, {
-      toValue: {x: 1000, y: 0},
-    }).start(this._resetState.bind(this));
+      toValue: {x: SCREEN_WIDTH + 50, y: 0},
+    }).start(()=> {
+      this.props.handleYup(this.state.card);
+      this._resetState();
+    });
   }
   
   _onNopePress() {
-    this.props.handleNope(this.state.card);
     this.props.cardRemoved
       ? this.props.cardRemoved(this.props.cards.indexOf(this.state.card))
       : null;
     Animated.timing(this.state.pan, {
-      toValue: {x: -1000, y: 0},
-    }).start(this._resetState.bind(this));
+      toValue: {x: -SCREEN_WIDTH - 50, y: 0},
+    }).start(()=> {
+      this.props.handleNope(this.state.card);
+      this._resetState();
+    });
   }
   
   renderNoMoreCards() {
