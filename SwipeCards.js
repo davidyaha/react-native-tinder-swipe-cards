@@ -77,6 +77,7 @@ class SwipeCards extends Component {
     yupText: React.PropTypes.string,
     noText: React.PropTypes.string,
     containerStyle: View.propTypes.style,
+    cardViewStyle: View.propTypes.style,
     buttonContainerStyle: View.propTypes.style,
     yupStyle: View.propTypes.style,
     yupTextStyle: Text.propTypes.style,
@@ -268,7 +269,7 @@ class SwipeCards extends Component {
       <View style={this.props.containerStyle}>
         { this.state.card
           ? (
-          <Animated.View style={[styles.card, animatedCardstyles]} {...this._panResponder.panHandlers}>
+          <Animated.View style={[this.props.cardViewStyle, animatedCardstyles]} {...this._panResponder.panHandlers}>
             {this.renderCard(this.state.card)}
           </Animated.View>
         )
