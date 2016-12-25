@@ -63,7 +63,7 @@ var styles = StyleSheet.create({
 class SwipeCards extends Component {
   static propTypes = {
     cards: React.PropTypes.array,
-    renderCards: React.PropTypes.func,
+    renderCard: React.PropTypes.func,
     loop: React.PropTypes.bool,
     renderNoMoreCards: React.PropTypes.func,
     renderYupButton: React.PropTypes.func,
